@@ -76,7 +76,7 @@
         path: /data/elasticsearch/instelk/etc/config/elasticsearch.yml
         block: |
           #action.destructive_requires_name: true
-          cluster.name: <cluster-name>
+          cluster.name: {{ cluster_name }}
 
           #give your nodes a name (change node number from node to node).
           node.name: "master1"
