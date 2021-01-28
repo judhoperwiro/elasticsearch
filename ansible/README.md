@@ -7,7 +7,7 @@
 ```shell 
 mkdir -p /ansible/elasticsearch/source/
 cd /ansible/elasticsearch
-vi install-elasticsearch.yaml
+vi install-elasticsearch-7-8-0.yaml
 vi inventory
 ```
 ### 2.) Run Ansible Playbook  
