@@ -1,6 +1,8 @@
 ```shell 
 #################Elasticsearch#######################
 
+ansible_host=machine-01 ip_address_machine01=10.0.x.x
+
 [elasticsearch]
 machine-01
 machine-02
