@@ -13,6 +13,7 @@ hostname-machine-03
 ansible_user=redhat
 ansible_ssh_pass=redhat
 ansible_sudo_pass=redhat
+cluster_name=elasticsearch
 ip_address_machine_01=10.0.0.1
 ip_address_machine_02=10.0.0.2
 ip_address_machine_03=10.0.0.3
