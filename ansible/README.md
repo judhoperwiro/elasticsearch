@@ -12,4 +12,4 @@ vi inventory
 ```
 ### 2.) Run Ansible Playbook  
 ```shell 
-ansible-playbook -i inventory install-elasticsearch.yaml
+ansible-playbook -i inventory install-elasticsearch-7-8-0.yaml
