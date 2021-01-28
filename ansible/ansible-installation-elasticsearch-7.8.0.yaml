@@ -76,7 +76,7 @@
         path: /data/elasticsearch/instelk/etc/config/elasticsearch.yml
         block: |
           #action.destructive_requires_name: true
-          cluster.name: <cluster-name>
+          cluster.name: {{ cluster_name }}
 
           #give your nodes a name (change node number from node to node).
           node.name: "master1"
@@ -91,11 +91,11 @@
           path.logs: /data/elasticsearch/instelk/logs
 
           #enter the private IP and port of your node:
-          network.host: <IP_ADDRESS_01>
+          network.host: {{ ip_address_machine }}
           http.port: 9200
 
           #detail the private IPs of your nodes:
-          discovery.seed_hosts: ["<IP_ADDRESS_01>,<IP_ADDRESS_02>,<IP_ADDRESS_03>"]
+          discovery.seed_hosts: ["{{ ip_address_machine_01 }}","{{ ip_address_machine_02 }}","{{ ip_address_machine_03 }}"]
 
           #Uncomment and set 2 if you have 3 masters
           discovery.zen.minimum_master_nodes: 2
@@ -195,12 +195,6 @@
           *       soft    nofile  65535
           *       hard    nproc   65535
           *       soft    nproc   65535
-
-#    - name: 15. Start Elasticsearch
-#      shell: |
-#        systemctl daemon-reload
-#        systemctl enable elasticsearch
-#        systemctl start elasticsearch
 
     - name: 15. Start Elasticsearch
       systemd:

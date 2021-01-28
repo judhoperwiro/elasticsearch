@@ -2,7 +2,7 @@
 
 ##### Component 
 
-- RHEL 7.8 
+- 3 machine with OS RedHat 7
 - elasticsearch-7.8.0-linux-x86_64.tar.gz 
 
 ### 1.) Prepare User 
@@ -289,6 +289,7 @@ curl http://<ip-address>:9200/_cluster/health
 
 ```
 
+## REPEAT ALL THE STEP ON MACHINE 2 AND 3
 
 
  
