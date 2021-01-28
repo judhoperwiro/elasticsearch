@@ -72,6 +72,7 @@ cp -r /Source/elasticsearch-7.8.0/* /data/elasticsearch/instelk/etc/
 
 ``` 
 
+​ 
 
 ### 3.) Elasticsearch Parameter Tuning 
 
@@ -84,7 +85,7 @@ Execute this command :
 ```shell 
 
 echo "#action.destructive_requires_name: true 
-cluster.name: kbank-lisa 
+cluster.name: [cluster-name] 
 
 #give your nodes a name (change node number from node to node). 
 node.name: "master1" 
@@ -99,17 +100,16 @@ path.data: /data/elasticsearch/instelk/db
 path.logs: /data/elasticsearch/instelk/logs 
 
 #enter the private IP and port of your node: 
-network.host: 10.219.165.104 
+network.host: <ip-address>
 http.port: 9200 
 
 #detail the private IPs of your nodes: 
-discovery.seed_hosts: ["10.219.165.104"] 
+discovery.seed_hosts: ["<ip-address-01>","<ip-address-02>","<ip-address-03>"] 
 
 #Uncomment and set 2 if you have 3 masters 
 discovery.zen.minimum_master_nodes: 2 
 
 #Add the hostname of each node if you have more than 1 nodes 
-
 cluster.initial_master_nodes: ["master1","master2","master3"] 
 
 " >> /data/elasticsearch/instelk/etc/config/elasticsearch.yml 
@@ -156,7 +156,7 @@ Environment=ES_PATH_CONF=/data/elasticsearch/instelk/etc/config
 Environment=PID_DIR=/data/elasticsearch/instelk/etc 
 
 WorkingDirectory=/data/elasticsearch/instelk/etc 
-​ 
+
 User=instelk 
 Group=dbgrp 
 
@@ -206,6 +206,8 @@ WantedBy=multi-user.target
 
 ``` 
 
+​
+
 ##### 4.2) Adjust Kernel Virtual Memory Size 
 
 Exec command: 
@@ -237,13 +239,7 @@ echo "
 
 ​ 
 
-​ 
 
-​ 
-
-​ 
-
-​ 
 
 ##### 4.4) Start Elasticsearch 
 
@@ -255,28 +251,18 @@ vi /data/elasticsearch/instelk/etc/config/jvm.options
 
 ``` 
 
-​ 
-
 Copy these lines to the script. 
 
-​ 
-
-- ```shell 
+ ```shell 
 
  -Xms2g 
  -Xmx2g 
 
  ``` 
 
-​ 
-
-​ 
-
-​ 
 
 Exec command: 
 
-​ 
 
 ```shell 
 
@@ -298,10 +284,11 @@ Exec command:
 
 ```shell 
 
-curl http://172.31.121.104:9200/_cluster/health 
+netstat -plnt
+curl http://<ip-address>:9200/_cluster/health 
 
-curl -X GET "kbdl-dc2-prd-logdata-01:9200/_cluster/health?wait_for_status=yellow&timeout=50s&pretty"
-curl -X GET "172.31.121.104:9300/_cluster/health?wait_for_status=yellow&timeout=50s&pretty"
+```
+
 
 
  
