@@ -1,0 +1,211 @@
+```shell 
+---
+- hosts: elasticsearch
+  remote_user: redhat
+  become: true
+  tasks:
+    - name: 01. Create Group dbgrp
+      group:
+        name: dbgrp
+        gid: 3000
+
+    - name: 02. Create a login user
+      user:
+        name: instelk
+        password: "{{ 'instelk' | password_hash('sha512') }}"
+        uid: 3112
+        group: dbgrp
+        state: present
+        shell: /bin/bash
+        expires: -1
+        home: /home/instelk
+
+    - name: 03. set users password valid time
+      shell: chage -I -1 -m 0 -M 99999 -E -1 instelk
+
+    - name: 04. prepare Source dir
+      file:
+        path: /Source
+        owner: root
+        group: root
+        mode: 0777
+        state: directory
+
+    - name: 05. transfer elasticsearch-7.8.0-linux-x86_64.tar
+      copy:
+        src: /data/ansible/elasticsearch/source/elasticsearch-7.8.0-linux-x86_64.tar.gz
+        dest: /Source/
+
+    - name: 06. Extract elasticsearch-7.8.0-linux-x86_64.tar.gz
+      unarchive:
+        src: /Source/elasticsearch-7.8.0-linux-x86_64.tar.gz
+        dest: /Source/
+        owner: instelk
+        group: dbgrp
+        mode: 0755
+        remote_src: yes
+
+    - name: 07. prepare source dir
+      file:
+        path: "{{ item }}"
+        mode: 0755
+        owner: instelk
+        group: dbgrp
+        state: directory
+        recurse: yes
+      with_items:
+        - /data/elasticsearch/instelk/db
+        - /data/elasticsearch/instelk/etc
+        - /data/elasticsearch/instelk/logs
+
+    - name: 08. Move Binary & Config Files to The Service Directory
+      become_user: instelk
+      shell: cp -r /Source/elasticsearch-7.8.0/* /data/elasticsearch/instelk/etc/
+
+    - name: 04. prepare Source dir
+      file:
+        path: /data/elasticsearch/instelk/etc/config/elasticsearch.yml
+        owner: instelk
+        group: dbgrp
+        mode: 0640
+        state: touch
+      tags: test
+
+    - name: 09. Modify elasticsearch.yml File
+      become_user: instelk
+      blockinfile:
+        path: /data/elasticsearch/instelk/etc/config/elasticsearch.yml
+        block: |
+          #action.destructive_requires_name: true
+          cluster.name: <cluster-name>
+
+          #give your nodes a name (change node number from node to node).
+          node.name: "master1"
+
+          #define node 1 as master-eligible:
+          node.master: true
+
+          #define nodes 2 and 3 as data nodes:
+          node.data: true
+
+          path.data: /data/elasticsearch/instelk/db
+          path.logs: /data/elasticsearch/instelk/logs
+
+          #enter the private IP and port of your node:
+          network.host: <IP_ADDRESS_01>
+          http.port: 9200
+
+          #detail the private IPs of your nodes:
+          discovery.seed_hosts: ["<IP_ADDRESS_01>,<IP_ADDRESS_02>,<IP_ADDRESS_03>"]
+
+          #Uncomment and set 2 if you have 3 masters
+          discovery.zen.minimum_master_nodes: 2
+
+          #Add the hostname of each node if you have more than 1 nodes
+          cluster.initial_master_nodes: ["master1","master2","master3"]
+
+    - name: 10. Set Elasticsearch JVM
+      become_user: instelk
+      shell: |
+        sed -i "s/-Xms1g/-Xms2g/g" /data/elasticsearch/instelk/etc/config/jvm.options
+        sed -i "s/-Xmx1g/-Xmx2g/g" /data/elasticsearch/instelk/etc/config/jvm.options
+
+    - name: 11. prepare Source dir
+      file:
+        path: /etc/systemd/system/elasticsearch.service
+        owner: root
+        group: root
+        mode: 0640
+        state: touch
+
+    - name: 12. Create SystemD Script
+      blockinfile:
+        path: /etc/systemd/system/elasticsearch.service
+        block: |
+          [Unit]
+          Description=Elasticsearch
+          Documentation=http://www.elastic.co
+          Wants=network-online.target
+          After=network-online.target
+
+          [Service]
+          RuntimeDirectory=elasticsearch
+          PrivateTmp=true
+          Environment=ES_HOME=/data/elasticsearch/instelk/etc
+          Environment=ES_PATH_CONF=/data/elasticsearch/instelk/etc/config
+          Environment=PID_DIR=/data/elasticsearch/instelk/etc
+
+          WorkingDirectory=/data/elasticsearch/instelk/etc
+
+          User=instelk
+          Group=dbgrp
+
+          ExecStart=/data/elasticsearch/instelk/etc/bin/elasticsearch -p /data/elasticsearch/instelk/etc/elasticsearch.pid --quiet
+
+          # StandardOutput is configured to redirect to journalctl since
+          # some error messages may be logged in standard output before
+          # elasticsearch logging system is initialized. Elasticsearch
+          # stores its logs in /var/log/elasticsearch and does not use
+          # journalctl by default. If you also want to enable journalctl
+          # logging, you can simply remove the "quiet" option from ExecStart.
+          StandardOutput=journal
+          StandardError=inherit
+
+          # Specifies the maximum file descriptor number that can be opened by this process
+          LimitNOFILE=65535
+
+          # Specifies the maximum number of processes
+          LimitNPROC=65535
+
+          # Specifies the maximum size of virtual memory
+          LimitAS=infinity
+
+          # Specifies the maximum file size
+          LimitFSIZE=infinity
+
+          # Disable timeout logic and wait until process is stopped
+          TimeoutStopSec=0
+
+          # SIGTERM signal is used to stop the Java process
+          KillSignal=SIGTERM
+
+          # Send the signal only to the JVM rather than its control group
+          KillMode=process
+
+          # Java process is never killed
+          SendSIGKILL=no
+
+          # When a JVM receives a SIGTERM signal it exits with code 143
+          SuccessExitStatus=143
+
+          [Install]
+          WantedBy=multi-user.target
+
+          # Built for packages-7.8.0 (packages)
+
+    - name: 13. Adjust Kernel Virtual Memory Size
+      shell: |
+        sysctl -w vm.max_map_count=262144
+        echo "vm.max_map_count=262144" >> /etc/sysctl.conf
+
+    - name: 14. Adjust Kernel Max Opened Files & Max Number of Processes
+      blockinfile:
+        path: /etc/security/limits.conf
+        block: |
+          *       hard    nofile  65535
+          *       soft    nofile  65535
+          *       hard    nproc   65535
+          *       soft    nproc   65535
+
+#    - name: 15. Start Elasticsearch
+#      shell: |
+#        systemctl daemon-reload
+#        systemctl enable elasticsearch
+#        systemctl start elasticsearch
+
+    - name: 15. Start Elasticsearch
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: elasticsearch
+        enabled: yes
