@@ -1,4 +1,3 @@
-```shell 
 ---
 - hosts: elasticsearch
   remote_user: redhat
