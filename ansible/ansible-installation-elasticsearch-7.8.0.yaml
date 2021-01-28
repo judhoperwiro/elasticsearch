@@ -91,11 +91,11 @@
           path.logs: /data/elasticsearch/instelk/logs
 
           #enter the private IP and port of your node:
-          network.host: "{{ ip_address_machine }}"
+          network.host: {{ ip_address_machine }}
           http.port: 9200
 
           #detail the private IPs of your nodes:
-          discovery.seed_hosts: [""{{ ip_address_machine_01 }}"",""{{ ip_address_machine_02 }}"",""{{ ip_address_machine_03 }}""]
+          discovery.seed_hosts: ["{{ ip_address_machine_01 }}","{{ ip_address_machine_02 }}","{{ ip_address_machine_03 }}"]
 
           #Uncomment and set 2 if you have 3 masters
           discovery.zen.minimum_master_nodes: 2
