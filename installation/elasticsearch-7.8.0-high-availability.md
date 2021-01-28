@@ -1,4 +1,4 @@
-## Elasticsearch v7.8.0 Installation Manual 
+## Elasticsearch v7.8.0 Installation Manual for High Availability
 
 ##### Component 
 
