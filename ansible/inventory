@@ -1,0 +1,12 @@
+```shell 
+#################Elasticsearch#######################
+
+[elasticsearch]
+machine-01
+machine-02
+machine-03
+
+[elasticsearch:vars]
+ansible_user=redhat
+ansible_ssh_pass=redhat
+ansible_sudo_pass=redhat
