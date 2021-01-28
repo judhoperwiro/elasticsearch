@@ -7,8 +7,8 @@
 
 ### 1.) Create Directory for Elasticsearch 
 ```shell 
-mkdir -p /ansible/elasticsearch/source/
-cd /ansible/elasticsearch
+mkdir -p /data/ansible/elasticsearch/source/
+cd /data/ansible/elasticsearch
 vi install-elasticsearch-7-8-0.yaml
 vi inventory
 ```
