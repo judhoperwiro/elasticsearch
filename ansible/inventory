@@ -1,13 +1,13 @@
 #################Elasticsearch#######################
 
-ansible_host=machine-01 ip_address_machine=10.0.0.1
-ansible_host=machine-02 ip_address_machine=10.0.0.2
-ansible_host=machine-03 ip_address_machine=10.0.0.3
+ansible_host=hostname-machine-01 ip_address_machine=10.0.0.1
+ansible_host=hostname-machine-02 ip_address_machine=10.0.0.2
+ansible_host=hostname-machine-03 ip_address_machine=10.0.0.3
 
 [elasticsearch]
-machine-01
-machine-02
-machine-03
+hostname-machine-01
+hostname-machine-02
+hostname-machine-03
 
 [elasticsearch:vars]
 ansible_user=redhat
