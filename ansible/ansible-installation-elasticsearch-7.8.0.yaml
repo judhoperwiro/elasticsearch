@@ -79,7 +79,7 @@
           cluster.name: {{ cluster_name }}
 
           #give your nodes a name (change node number from node to node).
-          node.name: "master1"
+          node.name: "{{ host }}"
 
           #define node 1 as master-eligible:
           node.master: true
@@ -101,7 +101,7 @@
           discovery.zen.minimum_master_nodes: 2
 
           #Add the hostname of each node if you have more than 1 nodes
-          cluster.initial_master_nodes: ["master1","master2","master3"]
+          cluster.initial_master_nodes: ["{{ hostname_01 }}","{{ hostname_02 }}","{{ hostname_03 }}"]
 
     - name: 10. Set Elasticsearch JVM
       become_user: instelk
