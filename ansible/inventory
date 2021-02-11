@@ -1,8 +1,8 @@
 #################Elasticsearch#######################
 
-hostname ansible_host=hostname-machine-01 ip_address_machine=10.0.0.1
-hostname ansible_host=hostname-machine-02 ip_address_machine=10.0.0.2
-hostname ansible_host=hostname-machine-03 ip_address_machine=10.0.0.3
+hostname ansible_host=hostname-machine-01 ip_address_machine=10.0.0.1 host=hostname-machine-01
+hostname ansible_host=hostname-machine-02 ip_address_machine=10.0.0.2 host=hostname-machine-02
+hostname ansible_host=hostname-machine-03 ip_address_machine=10.0.0.3 host=hostname-machine-03
 
 [elasticsearch]
 hostname-machine-01
@@ -17,3 +17,6 @@ cluster_name=elasticsearch
 ip_address_machine_01=10.0.0.1
 ip_address_machine_02=10.0.0.2
 ip_address_machine_03=10.0.0.3
+hostname_01=hostname-machine-01
+hostname_02=hostname-machine-02
+hostname_03=hostname-machine-03
